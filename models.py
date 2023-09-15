@@ -1,9 +1,10 @@
 from utils import get_random_number
 import matplotlib.pyplot as plt
 import numpy as np
+from enums import Calc
 
 class NeuronalRed:
-    def __init__(self,layers,neurons,x,d,epochs,step=0.2):
+    def __init__(self,layers,neurons,x,d,epochs,step=0.2,calc=Calc.GENERALLY_DELTA):
         # Layers of neural red
         self.layers   = []
         # Output of neural red
@@ -20,6 +21,7 @@ class NeuronalRed:
         self.index_training_data = 0
         # error convergence
         self.J = []
+        self.calc = calc
         for i in range(0,layers):
             input_layer = False
             output_layer  = False
@@ -145,7 +147,13 @@ class Neuron:
             self.error = (_w @ _deltas)
 
     def calculate_delta(self):
-        self.delta = self.output  * (1 - self.output) * self.error
+        if self._layer._neural_red.calc == Calc.GENERALLY_DELTA :
+            self.delta = self.output  * (1 - self.output) * self.error
+        else:
+            if not self._layer.output_layer:
+                self.delta = self.output  * (1 - self.output) * self.error
+            else:
+                self.delta = self.error
         self._layer.deltas[self.index] = self.delta
 
     def activation(self,v):
